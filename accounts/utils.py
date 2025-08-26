@@ -17,3 +17,17 @@ def sendEmailToken(email, token):
         settings.EMAIL_HOST_USER,  # From email
         [email],                # To email (list)
         )
+    
+def sendOTPtoEmail(email,otp):
+    subject = "OTP for Account login"
+    message = f"""Hi, Your OTP for login is: 
+
+                {otp}
+
+    """
+    send_mail(
+        subject, 
+        message, 
+        settings.EMAIL_HOST_USER,  # From email
+        [email],                # To email (list)
+    )
