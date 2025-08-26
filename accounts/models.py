@@ -8,13 +8,19 @@ class HotelUser(User):
     email_token = models.CharField(max_length=100, blank=True, null=True)
     otp = models.CharField(max_length=10, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    class Meta:
+        db_table = 'hotel_user'
 
 class HotelVendor(User):
     profile_picture = models.ImageField(upload_to='vendor_profile_pictures/')
     phone_number = models.CharField(max_length=15, unique=True)
+    business_name = models.CharField(max_length=200)
     email_token = models.CharField(max_length=100, blank=True, null=True)
     otp = models.CharField(max_length=10, blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'hotel_vendor'
 
 class Amenities(models.Model):
     name = models.CharField(max_length=1000)
