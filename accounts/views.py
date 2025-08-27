@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.db.models import Q
-from .utils import generateRandomEmailToken, sendEmailToken, sendOTPtoEmail
-from accounts.models import Hotel, HotelUser, HotelVendor
+from .utils import generateRandomEmailToken, generateSlug, sendEmailToken, sendOTPtoEmail
+from accounts.models import Amenities, Hotel, HotelUser, HotelVendor
 # Create your views here.
 def login_page(request):    
     if request.method == "POST":
@@ -166,3 +166,34 @@ def dashboard(request):
     hotels = Hotel.objects.filter(hotel_owner=request.user)
     context = {'hotels': hotels}
     return render(request, 'vendor/vendor_dashboard.html', context)
+
+def add_hotel(request):
+    if request.method == "POST":
+        hotel_name = request.POST.get('hotel_name')
+        hotel_description = request.POST.get('hotel_description')
+        hotel_price = request.POST.get('hotel_price')
+        hotel_offer_price = request.POST.get('hotel_offer_price')
+        hotel_location = request.POST.get('hotel_location')
+        hotel_slug = generateSlug(hotel_name)
+        hotel_amenities = request.POST.getlist('hotel_amenities')
+
+        hotel_vendor = HotelVendor.objects.get(id=request.user.id)
+
+        hotel = Hotel.objects.create(
+            hotel_name=hotel_name,
+            hotel_slug=hotel_slug,
+            description=hotel_description,
+            hotel_price=hotel_price,
+            hotel_offer_price=hotel_offer_price,
+            hotel_location=hotel_location,
+            hotel_owner=hotel_vendor
+        )
+        for amenity in hotel_amenities:
+            hotel.amenities.add(amenity)
+        hotel.save()
+
+        messages.success(request, "Hotel added successfully.")
+        return redirect('/account/add_hotel/')
+
+    amenities = Amenities.objects.all()
+    return render(request, 'vendor/add_hotel.html', {'amenities': amenities})

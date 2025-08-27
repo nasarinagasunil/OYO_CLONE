@@ -1,6 +1,9 @@
 import uuid
 from django.core.mail import send_mail
 from django.conf import settings
+
+from accounts.models import Hotel
+from django.utils.text import slugify
 def generateRandomEmailToken():
     return str(uuid.uuid4())
 
@@ -31,3 +34,9 @@ def sendOTPtoEmail(email,otp):
         settings.EMAIL_HOST_USER,  # From email
         [email],                # To email (list)
     )
+
+def generateSlug(hotel_name):
+    slug = f"{slugify(hotel_name)}-" + str(uuid.uuid4()).split('-')[0]
+    if Hotel.objects.filter(hotel_slug = slug).exists():
+        return generateSlug(hotel_name)
+    return slug
