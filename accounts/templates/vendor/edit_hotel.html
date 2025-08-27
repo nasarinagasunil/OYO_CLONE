@@ -29,7 +29,8 @@
                 <select class="form-select form-select-sm" multiple name="hotel_amenities"
                     aria-label="Multiple select example">
                     {% for amenity in amenities %}
-                    <option value="{{ amenity.id }}" {% if amenity in hotel.amenities.all %}selected{% endif %}>{{ amenity.name }}</option>
+                    <option value="{{amenity.id}}" {% if amenity  in hotel.amenities.all %}
+                    selected {% endif %}>{{amenity.name}}  </option>
                     {% endfor %}
                 </select>
 
