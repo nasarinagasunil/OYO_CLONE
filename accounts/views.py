@@ -2,11 +2,11 @@ import random
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from .utils import generateRandomEmailToken, generateSlug, sendEmailToken, sendOTPtoEmail
-from accounts.models import Amenities, Hotel, HotelUser, HotelVendor
+from accounts.models import Amenities, Hotel, HotelImages, HotelUser, HotelVendor
 # Create your views here.
 def login_page(request):    
     if request.method == "POST":
@@ -189,11 +189,33 @@ def add_hotel(request):
             hotel_owner=hotel_vendor
         )
         for amenity in hotel_amenities:
+            amenity = Amenities.objects.get(id=amenity)
             hotel.amenities.add(amenity)
-        hotel.save()
+            hotel.save()
 
         messages.success(request, "Hotel added successfully.")
         return redirect('/account/add_hotel/')
 
     amenities = Amenities.objects.all()
     return render(request, 'vendor/add_hotel.html', {'amenities': amenities})
+
+@login_required(login_url='login_vendor')
+def upload_image(request,hotel_slug):
+    hotel = Hotel.objects.get(hotel_slug=hotel_slug)
+    if request.method == "POST":
+        image=request.FILES.get('image')
+        HotelImages.objects.create(
+            hotel=hotel,
+            image=image
+        )
+        return HttpResponseRedirect(request.path_info)
+    return render(request, 'vendor/upload_image.html', context={'images': hotel.hotel_images.all(), 'hotel': hotel})
+
+@login_required(login_url='login_vendor')
+def delete_image(request, id):
+    print(id)
+    print("#######")
+    hotel_image = HotelImages.objects.get(id = id)
+    hotel_image.delete()
+    messages.success(request, "Hotel Image deleted")
+    return redirect('/account/dashboard/')
