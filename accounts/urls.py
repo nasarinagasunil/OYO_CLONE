@@ -13,5 +13,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('add_hotel/', views.add_hotel, name='add_hotel'),
     path('upload_image/<slug:hotel_slug>/', views.upload_image, name='upload_image'),
-    path('delete_image/<id>/', views.delete_image, name='delete_image')
+    path('delete_image/<id>/', views.delete_image, name='delete_image'),
+    path('edit_hotel/<slug:hotel_slug>/', views.edit_hotel, name='edit_hotel')
 ]

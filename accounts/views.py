@@ -219,3 +219,32 @@ def delete_image(request, id):
     hotel_image.delete()
     messages.success(request, "Hotel Image deleted")
     return redirect('/account/dashboard/')
+
+@login_required(login_url='login_vendor')
+def edit_hotel(request, hotel_slug):
+    hotel=Hotel.objects.get(hotel_slug=hotel_slug)
+    if request.user.id != hotel.hotel_owner.id:
+        return HttpResponse("You are not authorized to edit this hotel.")
+    if request.method == "POST":
+        # Retrieve updated hotel details from the form
+        hotel_name = request.POST.get('hotel_name')
+        hotel_description = request.POST.get('hotel_description')
+        hotel_price = request.POST.get('hotel_price')
+        hotel_offer_price = request.POST.get('hotel_offer_price')
+        hotel_location = request.POST.get('hotel_location')
+        
+        # Update hotel object with new details
+        hotel.hotel_name = hotel_name
+        hotel.hotel_description = hotel_description
+        hotel.hotel_price = hotel_price
+        hotel.hotel_offer_price = hotel_offer_price
+        hotel.hotel_location = hotel_location
+        hotel.save()
+        
+        messages.success(request, "Hotel Details Updated")
+
+        return HttpResponseRedirect(request.path_info)
+
+    # Retrieve amenities for rendering in the template
+    amenities = Amenities.objects.all()
+    return render(request, 'vendor/edit_hotel.html', {'hotel': hotel, 'amenities': amenities})
