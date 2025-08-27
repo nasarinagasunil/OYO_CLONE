@@ -25,6 +25,15 @@
 
             </div>
             <div class="mb-3">
+                <label for="floatingTextarea">Hotel Amenities</label>
+                <select class="form-select form-select-sm" multiple name="hotel_amenities" aria-label="Multiple select example">
+                    {% for amenity in amenities %}
+                    <option value="{{ amenity.id }}">{{ amenity.name }}</option>
+                    {% endfor %}
+                </select>
+
+            </div>
+            <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Hotel Price</label>
                 <input id="email" type="number" name="hotel_price" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp">
