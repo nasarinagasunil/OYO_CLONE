@@ -7,8 +7,13 @@ from django.shortcuts import redirect, render
 from django.db.models import Q
 from .utils import generateRandomEmailToken, generateSlug, sendEmailToken, sendOTPtoEmail
 from accounts.models import Amenities, Hotel, HotelImages, HotelUser, HotelVendor
+from home.models import HotelBooking
+
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
 # Create your views here.
-def login_page(request):    
+def login_page(request):  
+    next_url = request.GET.get('next', '/')  
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -28,10 +33,13 @@ def login_page(request):
         if user:
             messages.success(request, "Login Success")
             login(request, user)
-            return redirect('/account/login/')
+            # SECURITY CHECK → Ensure next URL is safe
+            if url_has_allowed_host_and_scheme(next_url, settings.ALLOWED_HOSTS):
+                return redirect(next_url)
+            return redirect('/')
 
         messages.warning(request, "Invalid credentials")
-        return redirect('/account/login/')
+        return redirect(f'/account/login/?next={next_url}')
     return render(request, 'login.html')
 
 def register(request):
@@ -84,17 +92,37 @@ def send_otp(request, email):
 
 def verify_otp(request, email):
     if request.method == "POST":
-        otp=request.POST.get('otp')
-        hotel_user = HotelUser.objects.get(email=email)
+        otp = request.POST.get('otp')
 
-        if(otp == hotel_user.otp):
-            messages.success(request, "OTP verified successfully.")
+        try:
+            hotel_user = HotelUser.objects.get(email=email)
+        except HotelUser.DoesNotExist:
+            messages.warning(request, "Invalid user.")
             return redirect('/account/login/')
-        
-        messages.warning(request, "Invalid OTP.")
-        return redirect(f'/account/login/{email}')
-    return render(request, 'verify_otp.html')
 
+        # Check if OTP matches
+        if otp == str(hotel_user.otp):
+            # Mark the user as verified if needed
+            hotel_user.is_verified = True
+            hotel_user.otp = None  # Clear OTP after verification for security
+            hotel_user.save()
+
+            # Authenticate and log the user in
+            user = authenticate(request, username=hotel_user.username, password=hotel_user.password)
+            if not user:
+                # Since we're using set_password, authenticate won't work directly
+                # So we fetch the user and login directly
+                user = hotel_user
+
+            login(request, user)
+            messages.success(request, "OTP verified successfully. You are now logged in!")
+            return redirect('/')  # Redirect to homepage or dashboard
+
+        # If OTP is wrong
+        messages.warning(request, "Invalid OTP.")
+        return redirect(f'/account/{email}/verify-otp/')
+
+    return render(request, 'verify_otp.html')
 def login_vendor(request):
     if request.method == "POST":
         email = request.POST.get('email')
@@ -162,6 +190,18 @@ def register_vendor(request):
 def dashboard(request):
     # Retrieve hotels owned by the current vendor
     hotels = Hotel.objects.filter(hotel_owner=request.user)
+
+    # Search filter
+    search_query = request.GET.get('search')
+    if search_query:
+        hotels = hotels.filter(hotel_name__icontains=search_query)
+    # Sorting filter
+    sort_by = request.GET.get('sort_by')
+    if sort_by:
+        if sort_by == "sort_low":
+            hotels = hotels.order_by('hotel_offer_price')  # Low to High
+        elif sort_by == "sort_high":
+            hotels = hotels.order_by('-hotel_offer_price')  # High to Low
     context = {'hotels': hotels}
     return render(request, 'vendor/vendor_dashboard.html', context)
 
@@ -248,4 +288,29 @@ def edit_hotel(request, hotel_slug):
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out successfully.")
-    return redirect('/account/login_vendor/')
+    return redirect('/')
+
+def vendor_hotel_details(request, hotel_slug):
+    hotel = Hotel.objects.get(hotel_slug=hotel_slug)
+    return render(request, 'vendor/vendor_hotel_details.html', {'hotel': hotel})
+
+def vendor_bookings(request):
+    vendor = request.user
+    bookings = HotelBooking.objects.filter(hotel__hotel_owner=vendor)
+    booking_details = []
+    for booking in bookings:
+        start = booking.booking_start_date
+        end = booking.booking_end_date
+        total_days = (end - start).days
+        total_price = booking.price * total_days
+
+        booking_details.append({
+            "customer_name": booking.booking_user.username,
+            "hotel_name": booking.hotel.hotel_name,
+            "hotel_location": booking.hotel.hotel_location,
+            "from_date": start,
+            "to_date": end,
+            "total_days": total_days,
+            "total_price": total_price,
+        })
+    return render(request, 'vendor/bookings.html', {'bookings': booking_details})

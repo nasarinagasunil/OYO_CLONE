@@ -6,7 +6,7 @@
     <!-- Hotel Name Outside the Card -->
     <h2 class="mb-4 text-center fw-bold">{{ hotel.hotel_name }}</h2>
 
-    <div class="card mb-3 shadow " style="max-width: 750px; margin: auto;">
+    <div class="card mb-3 shadow" style="max-width: 750px; margin: auto;">
         <div class="row g-0">
 
             <!-- Hotel Main Image -->
@@ -61,8 +61,24 @@
                         </p>
                     </div>
 
-                    <!-- Book Button -->
-                    <button class="btn btn-danger mt-3 px-4 align-self-start">Book Now</button>
+                    <!-- Booking Form -->
+                    <form method="POST" class="mt-3">
+                        {% csrf_token %}
+                        {% include "utils/alert.html" %}
+
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" class="form-control" id="startDate" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" name="end_date" class="form-control" id="endDate" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger px-4">Book Now</button>
+                    </form>
+
                 </div>
             </div>
         </div>

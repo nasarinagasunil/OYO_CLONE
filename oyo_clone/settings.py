@@ -143,3 +143,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'nagasunilnasari@gmail.com'      # Replace with your email
 EMAIL_HOST_PASSWORD = 'mjnx zrlj shys lvtc'     # Replace with your app password
+
+LOGIN_URL = '/login/'

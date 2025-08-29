@@ -1,0 +1,110 @@
+{% extends "utils/vendor_base.html" %}
+
+{% block content %}
+
+<style>
+    /* General Glow for All Text */
+    .glow-text {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.6),
+            0 0 10px rgba(255, 255, 255, 0.5),
+            0 0 15px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Special Styling for Price & Offer Price */
+    .price-highlight {
+        color: #ff4c4c;
+        /* Bright red */
+        font-size: 1.3rem;
+        font-weight: bold;
+        text-shadow: 0 0 6px rgba(255, 120, 120, 0.8),
+            0 0 12px rgba(255, 50, 50, 0.6);
+    }
+
+    .offer-highlight {
+        color: #00ff88;
+        /* Neon green */
+        font-size: 1.3rem;
+        font-weight: bold;
+        text-shadow: 0 0 6px rgba(0, 255, 170, 0.8),
+            0 0 12px rgba(0, 200, 140, 0.6);
+    }
+
+    /* Card Title Glow */
+    .hotel-title {
+        font-size: 2rem;
+        font-weight: bold;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9),
+            0 0 16px rgba(255, 255, 255, 0.7);
+    }
+</style>
+
+<div class="container mt-5">
+
+    <!-- Hotel Card with Image Overlay -->
+    <div class="card text-bg-dark shadow"
+        style="max-width: 800px; margin: auto; border-radius: 12px; overflow: hidden;">
+
+        <!-- Hotel Main Image -->
+        {% if hotel.hotel_images.first %}
+        <img src="/media/{{ hotel.hotel_images.first.image }}" class="card-img" alt="{{ hotel.hotel_name }}"
+            style="height: 400px; object-fit: cover;">
+        {% else %}
+        <img src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+            class="card-img" alt="Default Hotel Image" style="height: 400px; object-fit: cover;">
+        {% endif %}
+
+        <!-- Overlay Content -->
+        <div class="card-img-overlay d-flex flex-column justify-content-end" style="background: rgba(0, 0, 0, 0.45);">
+
+            <!-- Hotel Name -->
+            <h2 class="card-title hotel-title text-white text-center mb-3 mt-0">{{ hotel.hotel_name }}</h2>
+
+            <!-- Prices -->
+            <p class="card-text mb-1 d-flex justify-content-between glow-text">
+                <span class="price-highlight">Price:</span>
+                <span class="price-highlight">{{ hotel.hotel_price }}</span>
+            </p>
+            <p class="card-text mb-3 d-flex justify-content-between glow-text">
+                <span class="offer-highlight">Offer Price:</span>
+                <span class="offer-highlight">{{ hotel.hotel_offer_price }}</span>
+            </p>
+
+            <!-- Hotel Description -->
+            <p class="card-text text-white glow-text" style="text-align: justify;">
+                {{ hotel.description|safe }}
+            </p>
+
+            <!-- Hotel Amenities -->
+            <div class="mb-3">
+                {% if hotel.amenities.all %}
+                {% for amenity in hotel.amenities.all %}
+                <span class="badge bg-primary glow-text">{{ amenity.name }}</span>
+                {% endfor %}
+                {% else %}
+                <span class="badge bg-secondary glow-text">No Amenities</span>
+                {% endif %}
+            </div>
+
+            <!-- Hotel Location -->
+            <p class="card-text text-light mb-1 glow-text">
+                <i class="bi bi-geo-alt-fill"></i> Location: {{ hotel.hotel_location }}
+            </p>
+
+        </div>
+    </div>
+
+    <!-- Image Gallery Section -->
+    {% if hotel.hotel_images.count > 1 %}
+    <div class="row mt-4" style="max-width: 750px; margin: auto;">
+        {% for image in hotel.hotel_images.all %}
+        <div class="col-3 mb-3">
+            <img src="/media/{{ image.image }}" class="img-fluid rounded shadow-sm"
+                style="height: 80px; object-fit: cover;">
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

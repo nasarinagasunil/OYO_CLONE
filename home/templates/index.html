@@ -1,18 +1,18 @@
 {% extends "utils/base.html" %}
 
 {% block content %}
+{% include 'utils/alert.html' %}
 <div class="container mt-5 pt-5 pb-5">
     <div class="col-10 mx-auto">
-        <form class="d-flex">
-            <input type="text" name="search" class="form-control" placeholder="Search">
-            <select class="form-control" name="sort_by">
-                <option value="">Choose</option>
-                <option value="sort_low">Sort by Low to high</option>
-                <option value="sort_high">Sort by high to Low</option>
-
-
+        <h1 style="color: rgb(244, 30, 126);">Welcome...!</h1>
+        <form class="d-flex gap-2">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search by Hotel Name...">
+            <select class="form-control" name="sort_by" style="width: 200px;">
+                <option value="">Sort By Offer Price</option>
+                <option value="sort_low">Sort by Low to High</option>
+                <option value="sort_high">Sort by High to Low</option>
             </select>
-            <button type="submit" class="btn btn-warning mt-1">Search</button>
+            <button type="submit" class="btn btn-warning">Search</button>
         </form>
         <div class="row row-cols-1 row-cols-md-4 g-4 mt-4">
             {% for hotel in hotels %}
@@ -28,7 +28,8 @@
 
                     <div class="card-body">
                         <!-- Hotel Name -->
-                        <h5 class="card-title"><a href="{% url 'hotel_details' hotel.hotel_slug %}" style="color: rgb(244, 30, 126);">{{ hotel.hotel_name }}</a></h5>
+                        <h5 class="card-title"><a href="{% url 'hotel_details' hotel.hotel_slug %}"
+                                style="color: rgb(244, 30, 126);">{{ hotel.hotel_name }}</a></h5>
                         <!-- Hotel Description -->
                         <div class="d-flex justify-content-between">
                             <span class="text-danger">Price</span>

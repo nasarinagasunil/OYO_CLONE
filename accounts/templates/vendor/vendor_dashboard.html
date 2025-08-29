@@ -27,7 +27,8 @@
         display: flex;
         justify-content: space-between;
         padding: 8px;
-        gap: 4px; /* Small gap between buttons */
+        gap: 4px;
+        /* Small gap between buttons */
     }
 
     /* Make both buttons equal width */
@@ -38,19 +39,19 @@
 </style>
 
 <div class="container mt-1 pt-5 pb-5">
-    <div class="mx-auto col-6 text-center">
-        <a href="{% url 'add_hotel' %}" class="btn btn-success">Add Hotels</a>
-    </div>
-
-    <div class="col-10 mx-auto mt-4">
-        <form class="d-flex">
-            <input type="text" name="search" class="form-control" placeholder="Search">
-            <select class="form-control" name="sort_by">
-                <option value="">Choose</option>
+    <div class="col-10 mx-auto mt-2">
+        <div class="mb-4">
+            <a href="{% url 'add_hotel' %}" class="btn btn-danger">Add Hotels</a>
+            <a href="{% url 'vendor_bookings' %}" class="btn btn-dark">Bookings</a>
+        </div>
+        <form class="d-flex gap-2">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search by Hotel Name...">
+            <select class="form-control" name="sort_by" style="width: 200px;">
+                <option value="">Sort By</option>
                 <option value="sort_low">Sort by Low to High</option>
                 <option value="sort_high">Sort by High to Low</option>
             </select>
-            <button type="submit" class="btn btn-warning mt-1">Search</button>
+            <button type="submit" class="btn btn-danger">Search</button>
         </form>
 
         <div class="row row-cols-1 row-cols-md-4 g-4 mt-4">
@@ -67,7 +68,8 @@
 
                     <div class="card-body d-flex flex-column">
                         <!-- Hotel Name -->
-                        <h5 class="card-title mb-1">{{ hotel.hotel_name }}</h5>
+                        <h5 class="card-title mb-1"><a href="{% url 'vendor_hotel_details' hotel.hotel_slug %}"
+                                style="color:black; font-weight: bold;">{{ hotel.hotel_name }}</a></h5>
 
                         <!-- Hotel Description -->
                         <p class="card-text description mb-2">{{ hotel.description|safe|truncatewords:10 }}...</p>
@@ -86,8 +88,8 @@
 
                     <!-- Footer Buttons -->
                     <div class="card-footer">
-                        <a href="{% url 'upload_image' hotel.hotel_slug %}" class="btn btn-success">Image</a>
-                        <a href="{% url 'edit_hotel' hotel.hotel_slug %}" class="btn btn-warning">Edit</a>
+                        <a href="{% url 'upload_image' hotel.hotel_slug %}" class="btn btn-danger">Image</a>
+                        <a href="{% url 'edit_hotel' hotel.hotel_slug %}" class="btn btn-dark">Edit</a>
                     </div>
                 </div>
             </div>
