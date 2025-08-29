@@ -1,6 +1,6 @@
 import random
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -99,24 +99,22 @@ def login_vendor(request):
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
+        try:
+            hotel_user = HotelVendor.objects.get(email=email)
 
-        hotel_user = HotelVendor.objects.filter(
-            email = email)
-
-
-        if not hotel_user.exists():
+        except HotelVendor.DoesNotExist:
             messages.warning(request, "No Account Found.")
             return redirect('/account/login_vendor/')
 
-        if not hotel_user[0].is_verified:
+        if not hotel_user.is_verified:
             messages.warning(request, "Account not verified")
             return redirect('/account/login_vendor/')
 
-        hotel_user = authenticate(username = hotel_user[0].username , password=password)
+        hotel_user = authenticate(username=email, password=password)
 
         if hotel_user:
             messages.success(request, "Login Success")
-            login(request , hotel_user)
+            login(request, hotel_user)
             return redirect('/account/dashboard/')
 
         messages.warning(request, "Invalid credentials")
@@ -133,7 +131,7 @@ def register_vendor(request):
         password = request.POST.get('password')
         phone_number = request.POST.get('phone_number')
 
-        hotel_user = HotelUser.objects.filter(
+        hotel_user = HotelVendor.objects.filter(
             Q(email = email) | Q(phone_number  = phone_number)
         )
 
@@ -142,7 +140,7 @@ def register_vendor(request):
             return redirect('/account/register_vendor/')
 
         hotel_user = HotelVendor.objects.create(
-            username = phone_number,
+            username = email,
             first_name = first_name,
             last_name = last_name,
             email = email,
@@ -213,8 +211,6 @@ def upload_image(request,hotel_slug):
 
 @login_required(login_url='login_vendor')
 def delete_image(request, id):
-    print(id)
-    print("#######")
     hotel_image = HotelImages.objects.get(id = id)
     hotel_image.delete()
     messages.success(request, "Hotel Image deleted")
@@ -235,7 +231,7 @@ def edit_hotel(request, hotel_slug):
         
         # Update hotel object with new details
         hotel.hotel_name = hotel_name
-        hotel.hotel_description = hotel_description
+        hotel.description = hotel_description
         hotel.hotel_price = hotel_price
         hotel.hotel_offer_price = hotel_offer_price
         hotel.hotel_location = hotel_location
@@ -248,3 +244,8 @@ def edit_hotel(request, hotel_slug):
     # Retrieve amenities for rendering in the template
     amenities = Amenities.objects.all()
     return render(request, 'vendor/edit_hotel.html', {'hotel': hotel, 'amenities': amenities})
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('/account/login_vendor/')

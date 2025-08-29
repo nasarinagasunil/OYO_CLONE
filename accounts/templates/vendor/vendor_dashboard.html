@@ -1,33 +1,100 @@
-<!--vendor_dashboard-->
-
 {% extends "utils/vendor_base.html" %}
 
 {% block content %}
 {% include 'utils/alert.html' %}
 
-<div class="container mt-5">
+<!-- Inline CSS -->
+<style>
+    /* Show only 2 lines of description */
+    .description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        /* Show only two lines */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 10px;
+    }
+
+    /* Keep amenities close to the footer */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Align buttons evenly */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        gap: 4px; /* Small gap between buttons */
+    }
+
+    /* Make both buttons equal width */
+    .card-footer .btn {
+        flex: 1;
+        text-align: center;
+    }
+</style>
+
+<div class="container mt-1 pt-5 pb-5">
     <div class="mx-auto col-6 text-center">
         <a href="{% url 'add_hotel' %}" class="btn btn-success">Add Hotels</a>
-
     </div>
-    <div class="row mt-5">
-        {% for hotel in hotels %}
-        <div class="col-md-3">
-            <div class="card" style="width: 18rem;">
-                <img src="https://media.istockphoto.com/id/119926339/photo/resort-swimming-pool.jpg?s=612x612&w=0&k=20&c=9QtwJC2boq3GFHaeDsKytF4-CavYKQuy1jBD2IRfYKc=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">{{ hotel.hotel_name }}</h5>
-                    <p class="card-text">{{ hotel.description }}</p>
-                    {% for amenity in hotel.amenities.all %}
-                    <span class="badge bg-primary">{{ amenity.name }}</span>
-                    {% endfor %}
+
+    <div class="col-10 mx-auto mt-4">
+        <form class="d-flex">
+            <input type="text" name="search" class="form-control" placeholder="Search">
+            <select class="form-control" name="sort_by">
+                <option value="">Choose</option>
+                <option value="sort_low">Sort by Low to High</option>
+                <option value="sort_high">Sort by High to Low</option>
+            </select>
+            <button type="submit" class="btn btn-warning mt-1">Search</button>
+        </form>
+
+        <div class="row row-cols-1 row-cols-md-4 g-4 mt-4">
+            {% for hotel in hotels %}
+            <div class="col">
+                <div class="card h-100 shadow d-flex flex-column">
+                    {% if hotel.hotel_images.first %}
+                    <img style="height: 150px;" src="/media/{{ hotel.hotel_images.first.image }}" class="card-img-top"
+                        alt="Hotel Image">
+                    {% else %}
+                    <img src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                        class="card-img-top" alt="Default Hotel Image">
+                    {% endif %}
+
+                    <div class="card-body d-flex flex-column">
+                        <!-- Hotel Name -->
+                        <h5 class="card-title mb-1">{{ hotel.hotel_name }}</h5>
+
+                        <!-- Hotel Description -->
+                        <p class="card-text description mb-2">{{ hotel.description|safe|truncatewords:10 }}...</p>
+
+                        <!-- Push amenities to bottom -->
+                        <div class="mt-auto">
+                            {% if hotel.amenities.all %}
+                            {% for amenity in hotel.amenities.all %}
+                            <span class="badge bg-primary">{{ amenity.name }}</span>
+                            {% endfor %}
+                            {% else %}
+                            <span class="badge bg-secondary">No Amenities</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Footer Buttons -->
+                    <div class="card-footer">
+                        <a href="{% url 'upload_image' hotel.hotel_slug %}" class="btn btn-success">Image</a>
+                        <a href="{% url 'edit_hotel' hotel.hotel_slug %}" class="btn btn-warning">Edit</a>
+                    </div>
                 </div>
-                <a href="{% url 'upload_image' hotel.hotel_slug %}" class="btn btn-success mb-2 ">Image</a>
-                <a href="{% url 'edit_hotel' hotel.hotel_slug %}" class="btn btn-warning ">Edit</a>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
 
     </div>
+</div>
 
-    {% endblock %}
+{% endblock %}

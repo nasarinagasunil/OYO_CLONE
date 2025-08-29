@@ -2,51 +2,59 @@
 
 {% block content %}
 <div class="container mt-5 pt-5 pb-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card shadow" style="width: 18rem;">
-                <img src="https://media.istockphoto.com/id/119926339/photo/resort-swimming-pool.jpg?s=612x612&w=0&k=20&c=9QtwJC2boq3GFHaeDsKytF4-CavYKQuy1jBD2IRfYKc=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                        card’s content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-10 mx-auto">
+        <form class="d-flex">
+            <input type="text" name="search" class="form-control" placeholder="Search">
+            <select class="form-control" name="sort_by">
+                <option value="">Choose</option>
+                <option value="sort_low">Sort by Low to high</option>
+                <option value="sort_high">Sort by high to Low</option>
+
+
+            </select>
+            <button type="submit" class="btn btn-warning mt-1">Search</button>
+        </form>
+        <div class="row row-cols-1 row-cols-md-4 g-4 mt-4">
+            {% for hotel in hotels %}
+            <div class="col">
+                <div class="card h-100 shadow">
+                    {% if hotel.hotel_images.first %}
+                    <img style="height: 150px;" src="/media/{{ hotel.hotel_images.first.image }}" class="card-img-top"
+                        alt="Hotel Image">
+                    {% else %}
+                    <img src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                        class="card-img-top" alt="Default Hotel Image">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <!-- Hotel Name -->
+                        <h5 class="card-title"><a href="{% url 'hotel_details' hotel.hotel_slug %}" style="color: rgb(244, 30, 126);">{{ hotel.hotel_name }}</a></h5>
+                        <!-- Hotel Description -->
+                        <div class="d-flex justify-content-between">
+                            <span class="text-danger">Price</span>
+                            <span class="text-danger">{{ hotel.hotel_price }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-success">Offer Price</span>
+                            <span class="text-success">{{ hotel.hotel_offer_price }}</span>
+                        </div>
+                        <!-- {{ hotel.description| safe |truncatewords:10 }} -->
+                        <!-- Hotel Amenities -->
+                    </div>
+                    <div class="card-footer">
+                        {% if hotel.amenities.all %}
+                        {% for amenity in hotel.amenities.all %}
+                        <span class="badge bg-primary">{{ amenity.name }}</span>
+                        {% endfor %}
+                        {% else %}
+                        <span class="badge bg-secondary">No Amenities</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        <div class="col-md-3">
-            <div class="card shadow" style="width: 18rem;">
-                <img src="https://media.istockphoto.com/id/104731717/photo/luxury-resort.jpg?s=612x612&w=0&k=20&c=cODMSPbYyrn1FHake1xYz9M8r15iOfGz9Aosy9Db7mI=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                        card’s content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow" style="width: 18rem;">
-                <img src="https://cf.bstatic.com/xdata/images/hotel/max1024x768/385388071.jpg?k=de0b51f296a3d9431866b51b974921c9ebb50cacf08eb55c1eec1d468849ffe2&o=&hp=1" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                        card’s content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow" style="width: 18rem;">
-                <img src="https://cdn.britannica.com/96/115096-050-5AFDAF5D/Bellagio-Hotel-Casino-Las-Vegas.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                        card’s content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
 {% endblock %}

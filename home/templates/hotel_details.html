@@ -1,0 +1,85 @@
+{% extends "utils/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <!-- Hotel Name Outside the Card -->
+    <h2 class="mb-4 text-center fw-bold">{{ hotel.hotel_name }}</h2>
+
+    <div class="card mb-3 shadow " style="max-width: 750px; margin: auto;">
+        <div class="row g-0">
+
+            <!-- Hotel Main Image -->
+            <div class="col-md-4">
+                {% if hotel.hotel_images.first %}
+                    <img src="/media/{{ hotel.hotel_images.first.image }}" 
+                         class="img-fluid rounded-start h-100" 
+                         style="object-fit: cover;" 
+                         alt="{{ hotel.hotel_name }}">
+                {% else %}
+                    <img src="https://t4.ftcdn.net/jpg/04/70/29/97/360_F_470299797_UD0eoVMMSUbHCcNJCdv2t8B2g1GVqYgs.jpg"
+                         class="img-fluid rounded-start h-100"
+                         style="object-fit: cover;" 
+                         alt="Default Hotel Image">
+                {% endif %}
+            </div>
+
+            <!-- Hotel Details on the Right -->
+            <div class="col-md-8">
+                <div class="card-body d-flex flex-column justify-content-between">
+
+                    <!-- Prices -->
+                    <div>
+                        <p class="card-text mb-2 d-flex justify-content-between">
+                            <span class="fw-bold text-danger">Price:</span>
+                            <span>{{ hotel.hotel_price }}</span>
+                        </p>
+                        <p class="card-text mb-2 d-flex justify-content-between">
+                            <span class="fw-bold text-success">Offer Price:</span>
+                            <span>{{ hotel.hotel_offer_price }}</span>
+                        </p>
+
+                        <!-- Hotel Description -->
+                        <p class="card-text mt-3" style="text-align: justify;">
+                            {{ hotel.description|safe }}
+                        </p>
+
+                        <!-- Hotel Amenities -->
+                        <p class="mb-3">
+                            {% if hotel.amenities.all %}
+                                {% for amenity in hotel.amenities.all %}
+                                    <span class="badge bg-primary">{{ amenity.name }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="badge bg-secondary">No Amenities</span>
+                            {% endif %}
+                        </p>
+
+                        <!-- Hotel Location -->
+                        <p class="card-text text-muted mb-2">
+                            <i class="bi bi-geo-alt-fill"></i> Location: {{ hotel.hotel_location }}
+                        </p>
+                    </div>
+
+                    <!-- Book Button -->
+                    <button class="btn btn-danger mt-3 px-4 align-self-start">Book Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Gallery Section -->
+    {% if hotel.hotel_images.count > 1 %}
+    <div class="row mt-4" style="max-width: 750px; margin: auto;">
+        {% for image in hotel.hotel_images.all %}
+        <div class="col-3 mb-3">
+            <img src="/media/{{ image.image }}" 
+                 class="img-fluid rounded shadow-sm" 
+                 style="height: 80px; object-fit: cover;">
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
